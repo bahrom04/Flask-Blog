@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h2>{% block title %} {{ post['title'] }} {% endblock %}</h2>
-    <span class="badge badge-primary">{{ post['created'] }}</span>
+    <h2>{% block title %} {{ post[1] }} {% endblock %}</h2>
+    <span class="badge badge-primary">{{ post[3] }}</span>
     <br><br>
-    <p>{{ post['context'] }}</p>
+    {% if post[4] %}
+    <img src="{{ url_for('static', filename='uploads/' + post[4]) }}" style="height: 400px; width: auto;">
+    <br><br>
+    {% endif %}
+    <p>{{ post[2] }}</p>
 {% endblock %}

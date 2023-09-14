@@ -2,20 +2,31 @@
 
 {% block content %}
     <h2>{% block title %} Create New Post Below {% endblock %}</h2>
-<form method="post">
+<form method="POST" enctype="multipart/form-data">
+
     <div class="form-group">
         <label for="title">Title</label>
         <input type="text" name="title"
                placeholder="Post title" class="form-control"
                value="{{ request.form['title'] }}"></input>
     </div>
+    
+    <div class="form-group">
+        <label for="photo">Photo</label>
+        <input type="file" name="photo" class="form-control">
+
+    </div>    
+    
+
 
     <div class="form-group">
+
         <label for="content">Content</label>
         <textarea name="content" placeholder="Post content"
                   class="form-control">{{ request.form['content'] }}</textarea>
     </div>
     <div class="form-group">
+
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
