@@ -2,9 +2,12 @@
 {% block content %}
     <h2>{% block title %} {{ post[1] }} {% endblock %}</h2>
     <span class="badge badge-primary">{{ post[3] }}</span>
+    <a href="{{ url_for('edit', id=post[0]) }}">
+        <span class="badge badge-warning">Edit</span>
+    </a>
     <br><br>
     {% if post[4] %}
-    <img src="{{ url_for('static', filename='uploads/' + post[4]) }}" style="height: 400px; width: auto;">
+    <img src="{{ url_for('static', filename='uploads/' + post[4]) }}" class="img-fluid" alt="Responsive image">
     <br><br>
     {% endif %}
     <p>{{ post[2] }}</p>

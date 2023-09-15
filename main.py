@@ -1,5 +1,5 @@
 import mysql.connector
-
+import os
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -39,9 +39,15 @@ def get_post(post_id):
     conn.close()
     return post
 
+path = os.path.join('static', 'uploads')
+include = os.listdir(path)
+# print(include)
+yes = [x for x in include if x=='post_chad.jpg']
+for x in include:
+    print(x)
+    if x=='post_.chad.jpg':
+        print('yes', x)
 
-
-print(get_post(5))
 
 
 

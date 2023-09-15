@@ -4,3 +4,8 @@ h1{
     text-align: center;
     color: brown;
 }
+img{
+    display: block;
+    max-width: 100%;
+    height: auto;
+}

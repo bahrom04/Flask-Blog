@@ -2,7 +2,7 @@
 
 {% block content %}
 <br>
-<h1>{% block title %} This is index.html {% endblock %}</h1>
+<h1>{% block title %} Resent Posts {% endblock %}</h1>
 
     {% for post in posts %}
         <a href="{{ url_for('post', post_id=post[0]) }}">

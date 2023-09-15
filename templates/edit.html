@@ -2,7 +2,7 @@
 {% block content %}
 <h1>{% block title %} Edit "{{ post[1] }}" {% endblock %}</h1>
 
-<form method="post">
+<form method="POST" enctype="multipart/form-data">
     <div class="form-group">
         <label for="title">Title</label>
         <input type="text" name="title" placeholder="Post title"
@@ -10,7 +10,15 @@
                value="{{ request.form['title'] or post[1] }}">
         </input>
     </div>
+    {% if post[4] %}
+    <img src="{{ url_for('static', filename='uploads/' + post[4]) }}" class="img-fluid">
+    <br><br>
+    {% endif %}
+    <div class="form-group">
+        <label for="photo">Photo</label>
+        <input type="file" name="photo" class="form-control">
 
+    </div> 
     <div class="form-group">
         <label for="content">Content</label>
         <textarea name="content" placeholder="Post content"
@@ -26,5 +34,6 @@
     <input type="submit" value="Delete Post"
             class="btn btn-danger btn-sm"
             onclick="return confirm('Are you sure you want to delete this post?')">
+    <br><br><br>
 </form>
 {% endblock %}

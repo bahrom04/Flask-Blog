@@ -90,7 +90,7 @@ def create():
             conn.close()
             return redirect('index')
         else:
-    
+            
             filename = f'post_.{photo.filename}'
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
@@ -110,16 +110,32 @@ def create():
 @app.route('/<int:id>/edit>', methods=['GET','POST'])
 def edit(id):
     post = get_post(id)
+    conn = get_mysql_connection()
+    cur = conn.cursor()
 
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
+        photo = request.files['photo']
 
         if not title:
             flash('Title is strongly required')
         else:
-            conn = get_mysql_connection()
-            cur = conn.cursor()
+            if photo:
+
+                filename = f'post_.{photo.filename}'
+                uploads_folder_path = os.path.join('static', 'uploads')
+                uploads_folder_path_files = os.listdir(uploads_folder_path)
+                for file in uploads_folder_path_files:
+                    if file ==filename:
+                        cur.execute('UPDATE posts SET photo = %s WHERE id = %s',(filename,id))
+                        conn.commit()
+                        
+        
+                else:
+                    photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    cur.execute('UPDATE posts SET photo = %s WHERE id = %s',(filename,id))
+
             cur.execute('UPDATE posts SET title = %s, context = %s'
                          'WHERE id = %s', (title,content,id))
             conn.commit()
@@ -128,8 +144,10 @@ def edit(id):
 
     return render_template('edit.html', post=post)
 
+
+
 # Deleting posts
-@app.route('/<int:id>/delete', methods=['POST',])
+@app.route('/<int:id>/delete', methods=['POST','GET'])
 def delete(id):
     post = get_post(id)
     conn = get_mysql_connection()
@@ -137,7 +155,7 @@ def delete(id):
     cur.execute('DELETE FROM posts WHERE id = %s', (id,))
     conn.commit()
     conn.close()
-    flash('{} deleted succesfully'.format(post['title']))
+    # flash('{} deleted succesfully'.format(post['title']))
     return redirect(url_for('index'))
 
 @app.route('/about')

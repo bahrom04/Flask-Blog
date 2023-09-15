@@ -1,2 +1,1 @@
-for x in cursor:
-#     print(x)
+    # flash('{} deleted succesfully'.format(post['title']))
