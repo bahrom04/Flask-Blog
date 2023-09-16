@@ -1,4 +1,3 @@
-import sqlite3 as sql
 from flask import Flask, render_template, redirect, request, url_for, flash
 from werkzeug.exceptions import abort
 import mysql.connector as mysql
@@ -12,6 +11,8 @@ UPLOAD_FOLDER = os.path.join('static', 'uploads')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
+
 # Mysql connection.l
 def get_mysql_connection():
     mysql_connection = mysql.connect(
@@ -22,11 +23,7 @@ def get_mysql_connection():
     )
     return mysql_connection
     
-# Creating connection with db
-# def get_db_connection():
-#     conn = sql.connect('database.db')
-#     conn.row_factory = sql.Row
-#     return conn
+
 
 # Showing all posts from data
 @app.route('/index')
@@ -41,11 +38,19 @@ def index():
     connect.close()
     return render_template('index.html', posts=posts)
 
-    # # Sqlite part
-    # conn = get_db_connection()
-    # posts = conn.execute("SELECT * FROM posts").fetchall()
-    # conn.close()
-    # return render_template('index.html', posts=posts)
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
 
 def get_post(post_id):
     conn = get_mysql_connection()
@@ -157,10 +162,6 @@ def delete(id):
     conn.close()
     # flash('{} deleted succesfully'.format(post['title']))
     return redirect(url_for('index'))
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
 
 
 
