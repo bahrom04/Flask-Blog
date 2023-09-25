@@ -1,4 +1,13 @@
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import (
+    Flask, 
+    render_template, 
+    redirect, 
+    request, 
+    url_for, 
+    flash,
+    session,
+    
+)
 from werkzeug.exceptions import abort
 import mysql.connector as mysql
 import os
@@ -10,6 +19,12 @@ app.config['SECRET_KEY'] = 'bahromoken@githubbahrombek'
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Getting mysql when there is no get_mysql_connection
+# app.config['MYSQLY_HOST'] = 'localhost'
+# app.config['MYSQL_DATABASE_USER'] = 'root'
+# app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+# app.config['MYSQL_DATABASE_DB'] = 'blog'
 
 
 
@@ -27,7 +42,6 @@ def get_mysql_connection():
 
 # Showing all posts from data
 @app.route('/index')
-@app.route('/')
 def index():
     # mysql part
     connect = get_mysql_connection()
@@ -46,10 +60,45 @@ def about():
 
 
 
-@app.route('/login')
+@app.route('/')
+@app.route('/login', methods=['GET','POST'])
 def login():
-    return render_template('login.html')
+    msg = ''
+    if request.method == 'POST' and request.form['username'] == 'admin' and request.form['password'] == 'admin':
+        username = request.form['username']
+        password = request.form['password']
 
+        conn = get_mysql_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password,))
+        user = cur.fetchone()
+
+        if user:
+            session['logged_in'] = True
+            session['username'] = user[1]
+            session['id'] = user[0]
+            msg = 'Logged in as ' + user[1]
+            return render_template('index.html', msg=msg)
+        else:
+            msg = 'Incorrect username or password'
+    return render_template('login.html', message=msg)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    session.pop('id', None)
+    return redirect(url_for('login'))
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        conn = get_mysql_connection()
+        cur = conn.commit()
+        
 
 
 def get_post(post_id):
@@ -90,7 +139,7 @@ def create():
         if photo is None:
             conn = get_mysql_connection()
             cur = conn.cursor()
-            cur.execute('INSERT INTO posts (title, context) VALUES (?, ?)',(title,content))
+            cur.execute('INSERT INTO posts (title, context) VALUES (%s, %s)',(title,content))
             conn.commit()
             conn.close()
             return redirect('index')
@@ -162,6 +211,10 @@ def delete(id):
     conn.close()
     # flash('{} deleted succesfully'.format(post['title']))
     return redirect(url_for('index'))
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
 
 
 

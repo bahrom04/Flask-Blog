@@ -2,10 +2,14 @@ h1{
     border: 2px #eee solid;
     padding: 10px;
     text-align: center;
-    color: brown;
+    color: rgb(28, 24, 24);
 }
 img{
     display: block;
     max-width: 100%;
     height: auto;
+}
+body{
+    background: whitesmoke;
+    color: rgb(28, 24, 24);
 }
