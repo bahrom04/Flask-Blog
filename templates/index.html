@@ -2,6 +2,8 @@
 
 {% block content %}
 <br>
+<h1>Hi {{session['username']}}</h1>
+<a href="{{ url_for('logout') }}">Logout"></a>
 <h1>{% block title %} Resent Posts {% endblock %}</h1>
 
     {% for post in posts %}

@@ -11,6 +11,7 @@ from flask import (
 from werkzeug.exceptions import abort
 import mysql.connector as mysql
 import os
+import re
 
 # Configuration
 app = Flask(__name__)
@@ -64,7 +65,7 @@ def about():
 @app.route('/login', methods=['GET','POST'])
 def login():
     msg = ''
-    if request.method == 'POST' and request.form['username'] == 'admin' and request.form['password'] == 'admin':
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
 
@@ -77,11 +78,11 @@ def login():
             session['logged_in'] = True
             session['username'] = user[1]
             session['id'] = user[0]
-            msg = 'Logged in as ' + user[1]
-            return render_template('index.html', msg=msg)
+            flash('Logged in as ' + user[1])
+            return redirect(url_for('index'))
         else:
-            msg = 'Incorrect username or password'
-    return render_template('login.html', message=msg)
+            flash('Incorrect username or password')
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
@@ -92,12 +93,27 @@ def logout():
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-
+    msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
         conn = get_mysql_connection()
-        cur = conn.commit()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM accounts WHERE username = %s', (username,))
+        user = cur.fetchone()
+        if user:
+            flash('Username already exists')
+        elif not username or not password:
+            flash('Please fill out the form')
+        else:
+            cur.execute('INSERT INTO accounts (username, password) VALUES (%s, %s)', (username, password))
+            conn.commit()
+            conn.close()
+            flash('You have successfully registered')
+            return redirect(url_for('index'))
+    elif request.method == 'POST':
+        flash('Please fill out the form')
+    return render_template('register.html', msg=msg)
         
 
 
@@ -181,7 +197,7 @@ def edit(id):
                 uploads_folder_path = os.path.join('static', 'uploads')
                 uploads_folder_path_files = os.listdir(uploads_folder_path)
                 for file in uploads_folder_path_files:
-                    if file ==filename:
+                    if file == filename:
                         cur.execute('UPDATE posts SET photo = %s WHERE id = %s',(filename,id))
                         conn.commit()
                         
