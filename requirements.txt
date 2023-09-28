@@ -1,3 +1,5 @@
 Flask
 mysql-connector-python
 mysql-connector
+flask-login
+flask-wtf
