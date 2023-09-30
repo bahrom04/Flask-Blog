@@ -69,8 +69,8 @@ def logout():
     return redirect(url_for('login'))
 
 # New page to register
-@app.route('/register', methods=['GET','POST'])
 @app.route('/')
+@app.route('/register', methods=['GET','POST'])
 def register():
     # resister class from forms.py
     form = RegistrationForm()

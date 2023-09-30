@@ -9,7 +9,7 @@ border-radius: 13px;">
 <h1>Register</h1>
 <div class="msg">{{ msg }}</div>
     <form style="max-width: 500px; " action="{{ url_for('register') }}" method="POST">
-        
+        {{ form.hidden_tag() }}
       <!-- Username input -->
       {{ form.username.label() }}
       {{ form.username(class="form-control") }}
