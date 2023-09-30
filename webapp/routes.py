@@ -1,31 +1,10 @@
 from webapp import app
 from flask import render_template, flash, redirect, url_for, request, session
 import os
-import mysql.connector as mysql
 from webapp.forms import RegistrationForm
-
-# Mysql connection.l
-def get_mysql_connection():
-    mysql_connection = mysql.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="blog"
-    )
-    return mysql_connection
-    
-
-def get_post(post_id):
-    conn = get_mysql_connection()
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM posts WHERE id = %s',
-                        (post_id,))
-    post = cur.fetchone()
-
-    conn.close()
-    if cur is None:
-        return render_template('index.html')
-    return post
+from webapp import db
+from webapp.models import Accounts
+from webapp.database import get_mysql_connection, get_post
 
 # Showing 404 error
 @app.errorhandler(404)
@@ -46,19 +25,19 @@ def index():
     return render_template('index.html', posts=posts)
 
 
-
+# About Page
 @app.route('/about')
 def about():
     return render_template('about.html')
 
 
+# Post by id
 @app.route('/<int:post_id>')
 def post(post_id):
     post = get_post(post_id)
     return render_template('post.html', post=post)
     
 
-@app.route('/')
 @app.route('/login', methods=['GET','POST'])
 def login():
     msg = ''
@@ -89,13 +68,25 @@ def logout():
     session.pop('id', None)
     return redirect(url_for('login'))
 
-
+# New page to register
 @app.route('/register', methods=['GET','POST'])
+@app.route('/')
 def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST':
-        pass
-
+    # resister class from forms.py
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password1.data
+        user_create = Accounts(username, password)
+        db.session.add(user_create)
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    if form.errors != {}:
+        for error in form.errors.values():
+            flash('There was an error with creating a user: ',error)
+        
+    return render_template('register.html', form=form)
 
 
 
@@ -181,10 +172,9 @@ def edit(id):
 @app.route('/<int:id>/delete', methods=['POST','GET'])
 def delete(id):
     post = get_post(id)
-    conn = get_mysql_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM posts WHERE id = %s', (id,))
-    conn.commit()
-    conn.close()
     # flash('{} deleted succesfully'.format(post['title']))
+    with get_mysql_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM posts WHERE id = %s', (id,))
+        conn.commit()
     return redirect(url_for('index'))

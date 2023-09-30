@@ -3,3 +3,6 @@ mysql-connector-python
 mysql-connector
 flask-login
 flask-wtf
+wtf-forms
+pymysql
+wtforms-validators
