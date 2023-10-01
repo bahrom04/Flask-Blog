@@ -1,6 +1,7 @@
 from flask import Flask,render_template
 import os
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 # Configuration
 app = Flask(__name__)
@@ -13,6 +14,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/blo
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+
 
 from webapp import routes
 

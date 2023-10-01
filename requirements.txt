@@ -6,3 +6,4 @@ flask-wtf
 wtf-forms
 pymysql
 wtforms-validators
+flask-bcrypt

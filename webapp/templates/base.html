@@ -37,9 +37,13 @@
 
     <!-- Main content -->
     <div class="container">
-        {% for message in get_flashed_messages() %}
-        <div class="alert alert-info">{{ message }}</div>
-        {% endfor %}
+        {% with message = get_flashed_messages(with_categories=True) %}
+            {% if message %}
+                {% for category, message in message %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% block content %} {% endblock %}
     </div>
 

@@ -75,16 +75,16 @@ def register():
     # resister class from forms.py
     form = RegistrationForm()
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password1.data
-        user_create = Accounts(username, password)
+        
+        user_create = Accounts(username=form.username.data,
+                               password_decode=form.password1.data)
         db.session.add(user_create)
         db.session.commit()
         return redirect(url_for('index'))
     
     if form.errors != {}:
         for error in form.errors.values():
-            flash('There was an error with creating a user: ',error)
+            flash(f'There was an error with creating a user: {error}')
         
     return render_template('register.html', form=form)
 
