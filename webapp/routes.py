@@ -1,7 +1,7 @@
 from webapp import app
 from flask import render_template, flash, redirect, url_for, request, session
 import os
-from webapp.forms import RegistrationForm
+from webapp.forms import RegistrationForm, LoginForm
 from webapp import db
 from webapp.models import Accounts
 from webapp.database import get_mysql_connection, get_post
@@ -38,35 +38,7 @@ def post(post_id):
     return render_template('post.html', post=post)
     
 
-@app.route('/login', methods=['GET','POST'])
-def login():
-    msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        username = request.form['username']
-        password = request.form['password']
 
-        conn = get_mysql_connection()
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password,))
-        user = cur.fetchone()
-
-        if user:
-            session['logged_in'] = True
-            session['username'] = user[1]
-            session['id'] = user[0]
-            flash('Logged in as ' + user[1])
-            return redirect(url_for('index'))
-        else:
-            flash('Incorrect username or password')
-    return render_template('login.html')
-
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    session.pop('username', None)
-    session.pop('id', None)
-    return redirect(url_for('login'))
 
 # New page to register
 @app.route('/')
@@ -88,6 +60,24 @@ def register():
         
     return render_template('register.html', form=form)
 
+
+
+# Login page auth
+@app.route('/login', methods=['GET','POST'])
+def login():
+    # Login class
+    form = LoginForm()
+    return render_template('login.html', form=form)
+
+
+
+# Logout page
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    session.pop('id', None)
+    return redirect(url_for('login'))
 
 
 # New page to create posts

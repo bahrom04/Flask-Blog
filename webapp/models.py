@@ -18,6 +18,6 @@ class Accounts(db.Model):
         self.password = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
     
 
-
+ 
 
     
