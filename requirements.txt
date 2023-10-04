@@ -1,9 +1,9 @@
-Flask
+Flask==2.3.0
 mysql-connector-python
 mysql-connector
 flask-login
 flask-wtf
-wtf-forms
+wtforms
 pymysql
 wtforms-validators
 flask-bcrypt

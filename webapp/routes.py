@@ -5,7 +5,7 @@ from webapp.forms import RegistrationForm, LoginForm
 from webapp import db
 from webapp.models import Accounts
 from webapp.database import get_mysql_connection, get_post
-
+from flask_login import login_user
 # Showing 404 error
 @app.errorhandler(404)
 def not_found(error):
@@ -67,6 +67,20 @@ def register():
 def login():
     # Login class
     form = LoginForm()
+    if form.validate_on_submit():
+        attempted_user = Accounts.query.filter_by(username=form.username.data).first()
+        if attempted_user and attempted_user.check_password(
+            attempted_password=form.password.data
+        ):  
+            # Need to create check box to remember me like form.remember.data
+            login_user(attempted_user, remember=True)
+            flash(f'Success! You are logged in as: {attempted_user.username}', category='succes')
+            return redirect(url_for('index'))
+        
+        else:
+            flash('Username and password are not matched or some else', category='danger')
+
+
     return render_template('login.html', form=form)
 
 
