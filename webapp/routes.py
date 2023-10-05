@@ -5,7 +5,9 @@ from webapp.forms import RegistrationForm, LoginForm
 from webapp import db
 from webapp.models import Accounts
 from webapp.database import get_mysql_connection, get_post
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
+
+
 # Showing 404 error
 @app.errorhandler(404)
 def not_found(error):
@@ -52,6 +54,8 @@ def register():
                                password_decode=form.password1.data)
         db.session.add(user_create)
         db.session.commit()
+        login_user(user_create)
+        flash(f'Success! You are logged in as: {user_create.username}', category='succes')
         return redirect(url_for('index'))
     
     if form.errors != {}:
@@ -73,7 +77,7 @@ def login():
             attempted_password=form.password.data
         ):  
             # Need to create check box to remember me like form.remember.data
-            login_user(attempted_user, remember=True)
+            login_user(attempted_user)
             flash(f'Success! You are logged in as: {attempted_user.username}', category='succes')
             return redirect(url_for('index'))
         
@@ -88,14 +92,14 @@ def login():
 # Logout page
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
-    session.pop('username', None)
-    session.pop('id', None)
-    return redirect(url_for('login'))
+    logout_user()
+    return redirect(url_for('index'))
+
 
 
 # New page to create posts
 @app.route('/create', methods=['GET','POST'])
+@login_required
 def create():
     if request.method == 'POST':
         title = request.form['title']
